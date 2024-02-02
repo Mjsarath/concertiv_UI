@@ -14,7 +14,9 @@ class HomePage(BasePage):
         self.wait_for_page_url(HOMEPAGE_CONSTANTS.HOME_PAGE_URL)
         self.wait_for_element_visibility(HomePageLocators.HOMEPAGE_ELEMENT)
 
-    def click_market_data(self, navbar_menu, sub_menu):
+    def click_market_data(self, navbar_menu):
+        """To click market data sub-menu in Solutions navbar menu
+        :param navbar_menu: Main menu label, where the sub-menu needs to clicked in present"""
         elements = self.get_all_elements(HomePageLocators.NAVBAR_OPTIONS)
         sub_element = self.get_element(HomePageLocators.SOLUTIONS_SUB_MENU)
         for element in elements:
@@ -23,6 +25,8 @@ class HomePage(BasePage):
                 break
 
     def handle_cookies(self, target_locator):
+        """To accept or decline the cookies alert in the homepage
+        :param target_locator : the target locator object"""
         self.wait_for_element_visibility(target_locator)
         self.click(target_locator)
 
