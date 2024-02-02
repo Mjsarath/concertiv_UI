@@ -1,7 +1,5 @@
-import time
 
 from selenium.webdriver import ActionChains
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -47,7 +45,7 @@ class BasePage:
         locator = WebDriverWait(self.driver, self.web_driver_timeout).until(EC.presence_of_element_located(element))
         return locator.text.strip()
 
-    def get_all_elements(self, target_locator, no_wait=False):
+    def get_all_elements(self, target_locator):
         """To get all the element instance from the DOM
         :returns : The list of web element """
         return WebDriverWait(self.driver, self.web_driver_timeout).until(
@@ -64,42 +62,18 @@ class BasePage:
         self.driver.execute_script("window.scrollBy(0,300);")
 
     def get_element(self, target_locator, no_wait=False):
-        """Returns element matching the locator as Selenium Webelement
+        """Returns element matching the locator as Selenium Web element
 
         :param target_locator: The target locator
         :param no_wait: Set to True to fetch the element directly without
         waiting. Defaults to False.
-        :returns: the found element as a Selenium Webelement
+        :returns: the found element as a Selenium Web element
         """
         if no_wait:
             EC.presence_of_element_located(target_locator)
         else:
             return WebDriverWait(self.driver, self.web_driver_timeout).until(
                 EC.presence_of_element_located(target_locator))
-
-    def is_element_invisible(self, target_locator):
-        """Checks whether the target element is not present
-        :param target_locator: The target locator
-        :return: True is not present, raises exception if present
-        """
-        try:
-            WebDriverWait(self.driver, self.web_driver_timeout / 2).until(
-                EC.invisibility_of_element_located(target_locator))
-            return True
-        except Exception as _err:
-            return False
-
-    def wait_for_page_loader_to_finish(self):
-        """Waits for the page loader to go away if present
-        :return:  True is visible, else raises exception
-        """
-        try:
-            self.get_element("BasePageLocators.PAGE_LOADER")
-            self.is_element_invisible("BasePageLocators.PAGE_LOADER")
-            time.sleep(1)
-        except Exception as err:
-            pass
-        return True
 
     def wait_for_element_visibility(self, target_locator):
         """Waits for element to be visible
@@ -113,20 +87,33 @@ class BasePage:
         return True
 
     def switch_to_frame(self, frame=0):
+        """To switch into the frame in DOM loaded
+        :param frame : The frame index"""
         self.driver.switch_to.frame(frame)
 
     def switch_to_default(self):
+        """To switch back to the default content of the DOM"""
         self.driver.switch_to.default_content()
 
     def hover_on_element_and_click(self, target_locator, sub_menu):
+        """To hover on the given web element to perform desired actions
+        :param target_locator: The target locator object, on which the hover action needs to be done
+        :param sub_menu: Sub-menu that needs to selected after hovering."""
         ac = ActionChains(self.driver)
         ac.move_to_element(target_locator).click(sub_menu).perform()
 
-    def slide_into_given_value(self,target_locator, input_value):
+    def slide_into_given_value(self, target_locator, input_value, yoffset=0):
+        """To slide/give input to the slider input field in DOM
+        :param target_locator : The target locator object
+        :param input_value : x offset value
+        :param yoffset: y offset value"""
         ac = ActionChains(self.driver)
         element = self.get_element(target_locator)
-        ac.click_and_hold(element).move_by_offset(input_value,0).release().perform()
+        ac.click_and_hold(element).move_by_offset(input_value, yoffset).release().perform()
 
-    def verify_page_loaded_successfully(self,target_locator):
-
+    def verify_page_loaded_successfully(self, target_locator):
+        """To verify the target locator is successfully loaded in DOM
+        :param target_locator: The target locator object
+        :returns : returns True if element is visible, raises exception if
+        fails"""
         return self.wait_for_element_visibility(target_locator)
